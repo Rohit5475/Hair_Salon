@@ -1,31 +1,30 @@
 const express = require("express");
-const User = require("../models/User");
-const router = express.Router();
-
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const generateToken = require("../utils/generateToken");
+
+const router = express.Router();
 
 // REGISTER
 router.post("/register", async (req, res) => {
   const { name, email, password, phone, gender, role } = req.body;
 
   const userExists = await User.findOne({ email });
-  if (userExists) {
-    return res.json({ message: "User already exists" });
-  }
+  if (userExists)
+    return res.status(400).json({ message: "User already exists" });
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await User.create({
+  const user = await User.create({
     name,
     email,
     password: hashedPassword,
     phone,
     gender,
-    role
+    role,
   });
 
-  res.json({ message: "Registered successfully" });
+  res.status(201).json({ message: "Registered successfully" });
 });
 
 // LOGIN
@@ -33,27 +32,27 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
-  if (!user) {
-    return res.json({ message: "Invalid credentials" });
-  }
+  if (!user)
+    return res.status(401).json({ message: "Invalid credentials" });
 
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    return res.json({ message: "Invalid credentials" });
-  }
-
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    "secretkey",
-    { expiresIn: "1d" }
-  );
+  if (!isMatch)
+    return res.status(401).json({ message: "Invalid credentials" });
 
   res.json({
     message: "Login successful",
-    token,
+    token: generateToken(user),
     role: user.role,
-    userId: user._id
+    userId: user._id,
   });
 });
+
+// example
+const { protect, adminOnly } = require("../middleware/authMiddleware");
+
+router.get("/admin-dashboard", protect, adminOnly, (req, res) => {
+  res.json({ message: "Welcome Admin" });
+});
+
 
 module.exports = router;
