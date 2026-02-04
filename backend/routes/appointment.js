@@ -1,15 +1,10 @@
-const router = require("express").Router();
-const Appointment = require("../models/Appointment");
-const auth = require("../middleware/authMiddleware");
+const express = require("express");
+const protect = require("../middleware/authMiddleware");
 
-router.post("/", auth, async (req, res) => {
-  const appointment = new Appointment({
-    userId: req.user.id,
-    service: req.body.service,
-    date: req.body.date,
-  });
-  await appointment.save();
-  res.send("Appointment Booked");
+const router = express.Router();
+
+router.get("/", protect, (req, res) => {
+  res.json({ message: "Secure data accessed", user: req.user });
 });
 
 module.exports = router;

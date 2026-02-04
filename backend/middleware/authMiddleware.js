@@ -1,40 +1,22 @@
-const mongoose = require("mongoose");
-
-const connectDB = async () => {
-  await mongoose.connect("mongodb://127.0.0.1:27017/mernAuth");
-  console.log("MongoDB Connected");
-};
-
-module.exports = connectDB;
-
-
-
-// extra
-
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-const protect = (req, res, next) => {
-  let token = req.headers.authorization;
+const protect = async (req, res, next) => {
+  let token;
 
-  if (token && token.startsWith("Bearer")) {
+  if (req.headers.authorization?.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
+
     try {
-      token = token.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded;
+      req.user = await User.findById(decoded.id).select("-password");
       next();
-    } catch (error) {
-      return res.status(401).json({ message: "Invalid token" });
+    } catch {
+      res.status(401).json({ message: "Invalid token" });
     }
   } else {
-    return res.status(401).json({ message: "No token provided" });
+    res.status(401).json({ message: "No token provided" });
   }
 };
 
-const adminOnly = (req, res, next) => {
-  if (req.user.role !== "admin") {
-    return res.status(403).json({ message: "Admin access only" });
-  }
-  next();
-};
-
-module.exports = { protect, adminOnly };
+module.exports = protect;

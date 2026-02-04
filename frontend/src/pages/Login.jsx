@@ -1,90 +1,20 @@
-// export default function Login() {
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-sky-300 to-blue-400 px-4">
-      
-//       {/* Main Card */}
-//       <div className="bg-white rounded-2xl shadow-xl max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden">
-        
-//         {/* LEFT SIDE – LOGIN FORM */}
-//         <div className="p-10">
-//           <h2 className="text-3xl font-bold mb-2">Let’s Catch Big Dreams!</h2>
-//           <p className="text-gray-500 mb-6">
-//             Pursue your dreams passionately and strive to achieve your goals every day.
-//           </p>
+import API from "../utils/axios";
+import { useState } from "react";
 
-//           <form className="space-y-4">
-//             <div>
-//               <label className="text-sm font-medium">Email</label>
-//               <input
-//                 type="email"
-//                 placeholder="Enter your email"
-//                 className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-//               />
-//             </div>
+export default function Login() {
+  const [form, setForm] = useState({});
 
-//             <div>
-//               <label className="text-sm font-medium">Password</label>
-//               <input
-//                 type="password"
-//                 placeholder="Enter your password"
-//                 className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-//               />
-//             </div>
+  const submit = async () => {
+    const res = await API.post("/auth/login", form);
+    localStorage.setItem("token", res.data.token);
+    window.location.href = "/";
+  };
 
-//             <button
-//               type="button"
-//               className="w-full bg-orange-400 hover:bg-orange-500 text-white py-3 rounded-lg font-semibold transition"
-//             >
-//               Sign In
-//             </button>
-//           </form>
-
-//           <p className="text-sm text-gray-500 mt-4">
-//             By continuing, you agree to our Terms & Privacy Policy
-//           </p>
-
-//           {/* Social Login */}
-//           <div className="mt-6 space-y-3">
-//             <button className="w-full border py-2 rounded-lg flex justify-center items-center gap-2">
-//               <span>Continue with Google</span>
-//             </button>
-//             <button className="w-full border py-2 rounded-lg flex justify-center items-center gap-2">
-//               <span>Continue with Apple</span>
-//             </button>
-//           </div>
-
-//           <p className="text-center text-sm mt-6">
-//             Don’t have an account?{" "}
-//             <span className="text-blue-500 cursor-pointer">Sign Up</span>
-//           </p>
-//         </div>
-
-//         {/* RIGHT SIDE – IMAGE / CONTENT */}
-//         <div className="hidden md:flex flex-col justify-end bg-gradient-to-b from-blue-200 to-blue-500 p-8 text-white relative">
-//           <h2 className="text-3xl font-bold mb-2">
-//             Catch Your Biggest Opportunities
-//           </h2>
-//           <p className="text-sm mb-6">
-//             Become part of a vibrant community and embark on an exciting journey today.
-//           </p>
-
-//           {/* Fake illustration block (replace later with image) */}
-//           <div className="absolute top-10 right-10 w-40 h-40 bg-white/30 rounded-full"></div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-// const login = async () => {
-//   const res = await axios.post("/auth/login", {
-//     email,
-//     password,
-//   });
-
-//   localStorage.setItem("token", res.data.token);
-//   localStorage.setItem("role", res.data.role);
-
-//   if (res.data.role === "admin") navigate("/admin/dashboard");
-//   else if (res.data.role === "staff") navigate("/staff/dashboard");
-//   else navigate("/my-bookings");
-// };
+  return (
+    <>
+      <input placeholder="Email" onChange={e=>setForm({...form,email:e.target.value})}/>
+      <input type="password" placeholder="Password" onChange={e=>setForm({...form,password:e.target.value})}/>
+      <button onClick={submit}>Login</button>
+    </>
+  );
+}

@@ -13,10 +13,8 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* PUBLIC ROUTE */}
         <Route path="/" element={<Auth />} />
 
-        {/* ADMIN ROUTE */}
         <Route
           path="/admin/dashboard"
           element={
@@ -26,7 +24,6 @@ function App() {
           }
         />
 
-        {/* STAFF ROUTE */}
         <Route
           path="/staff/dashboard"
           element={
@@ -36,7 +33,6 @@ function App() {
           }
         />
 
-        {/* CUSTOMER ROUTE */}
         <Route
           path="/customer/dashboard"
           element={
